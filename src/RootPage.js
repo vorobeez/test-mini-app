@@ -2,12 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import { MessageType } from "@dlghq/mini-apps-bridge";
 
-import {useBridge} from "./Bridge";
+import { useBridge } from "./Bridge";
 
 export function RootPage() {
     const location = useLocation();
-    const [messageContent, setMessageContent] = useState();
-    const [peer, setPeer] = useState();
+    const [messageExtensionsPayload, setMessageExtensionPayload] = useState();
+    const [peerExtensionsPayload, setPeerExtensionPayload] = useState();
     const params = useMemo(() => new URLSearchParams(location.search), [location]);
     const bridge = useBridge();
 
@@ -24,7 +24,7 @@ export function RootPage() {
                         messageId,
                     },
                 }).then((message) => {
-                    setMessageContent(message.payload.messageContent);
+                    setMessageExtensionPayload(message.payload);
                 });
             } else if (peerId) {
                 bridge.sendRequest({
@@ -33,23 +33,23 @@ export function RootPage() {
                         peerId: Number(peerId),
                     },
                 }).then((message) => {
-                    setPeer(message.payload.peer);
+                    setPeerExtensionPayload(message.payload.peer);
                 });
             }
         }
     }, [bridge, params]);
 
     return (
-        <React.Fragment>
+        <div>
             <h1>Root Page</h1>
             <h2>Message Extension</h2>
-            {messageContent && (
-                <p>{JSON.stringify(messageContent, null, 2)}</p>
+            {messageExtensionsPayload && (
+                <pre>{JSON.stringify(messageExtensionsPayload, null, 2)}</pre>
             )}
             <h2>Peer Extension</h2>
-            {peer && (
-                <p>{JSON.stringify(peer, null, 2)}</p>
+            {peerExtensionsPayload && (
+                <pre>{JSON.stringify(peerExtensionsPayload, null, 2)}</pre>
             )}
-        </React.Fragment>
+        </div>
     );
 }
